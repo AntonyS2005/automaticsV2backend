@@ -41,20 +41,23 @@ public class ServicioValidacion {
       errores.add("Regla 8: La cadena debe terminar obligatoriamente con un punto (.).");
     }
 
-    for (int i = 1; i < (longitud - 1); i++) {
+    for (int i = 1; i < longitud; i++) {
       char caracterActual = cadenaEntrada.charAt(i);
       char caracterAnterior = cadenaEntrada.charAt(i - 1);
+      boolean esCaracterInterno = (i < (longitud - 1));
 
-      if (!Character.isLowerCase(caracterActual) && !esPuntuacionInterna(caracterActual) && esLetraEspanola(caracterActual)) {
-        errores.add("Regla 2: El carácter '" + caracterActual + "' debe ser minúscula.");
-      }
+      if (esCaracterInterno) {
+        if (!Character.isLowerCase(caracterActual) && !esPuntuacionInterna(caracterActual) && esLetraEspanola(caracterActual)) {
+          errores.add("Regla 2: El carácter '" + caracterActual + "' debe ser minúscula.");
+        }
 
-      if (!esLetraEspanola(caracterActual) && !esPuntuacionInterna(caracterActual)) {
-        errores.add("Regla 3: El carácter '" + caracterActual + "' no está permitido. Solo se acepta (,:;).");
-      }
+        if (!esLetraEspanola(caracterActual) && !esPuntuacionInterna(caracterActual)) {
+          errores.add("Regla 3: El carácter '" + caracterActual + "' no está permitido. Solo se acepta (,:;).");
+        }
 
-      if (caracterActual == '.') {
-        errores.add("Regla 9 (Derivada): El punto (.) solo se permite como último carácter.");
+        if (caracterActual == '.') {
+          errores.add("Regla 9 (Derivada): El punto (.) solo se permite como último carácter.");
+        }
       }
 
       if (caracterActual == caracterAnterior) {
@@ -69,7 +72,6 @@ public class ServicioValidacion {
         }
       }
     }
-
     return new ArrayList<>(errores);
   }
 
