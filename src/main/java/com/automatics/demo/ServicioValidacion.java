@@ -21,7 +21,7 @@ public class ServicioValidacion {
     }
 
     if (cadenaEntrada.length() < 2) {
-      errores.add("La cadena es demasiado corta. Debe empezar con mayúscula y terminar con punto (ej. 'A.').");
+      errores.add("La cadena es demasiado corta. Debe empezar con mayúscula o número y terminar con punto (ej. 'A.' o '123.').");
       return new ArrayList<>(errores);
     }
 
@@ -29,6 +29,49 @@ public class ServicioValidacion {
     char primerCaracter = cadenaEntrada.charAt(0);
     char ultimoCaracter = cadenaEntrada.charAt(longitud - 1);
 
+    // Detectar si la cadena contiene letras y números
+    boolean contieneLetras = false;
+    boolean contieneNumeros = false;
+
+    for (int i = 0; i < longitud - 1; i++) { // Excluimos el punto final
+      char c = cadenaEntrada.charAt(i);
+      if (esLetraEspanola(c)) {
+        contieneLetras = true;
+      }
+      if (Character.isDigit(c)) {
+        contieneNumeros = true;
+      }
+    }
+
+    // Regla 11: No se pueden mezclar letras y números
+    if (contieneLetras && contieneNumeros) {
+      errores.add("Regla 11: No se pueden mezclar letras y números en la misma cadena.");
+      return new ArrayList<>(errores); // Retornamos inmediatamente si hay mezcla
+    }
+
+    // Si es solo números
+    if (contieneNumeros && !contieneLetras) {
+      if (!Character.isDigit(primerCaracter)) {
+        errores.add("Regla 12: Si la cadena contiene números, debe comenzar con un número.");
+      }
+
+      if (ultimoCaracter != '.') {
+        errores.add("Regla 8: La cadena debe terminar obligatoriamente con un punto (.).");
+      }
+
+      // Validar que solo contenga números, puntuación permitida y el punto final
+      for (int i = 0; i < longitud - 1; i++) {
+        char c = cadenaEntrada.charAt(i);
+        if (!Character.isDigit(c) && !esPuntuacionInterna(c)) {
+          errores.add("Regla 13: En cadenas numéricas solo se permiten dígitos y puntuación (,:;).");
+          break;
+        }
+      }
+
+      return new ArrayList<>(errores);
+    }
+
+    // A partir de aquí, validaciones solo para cadenas con letras
     if (!Character.isUpperCase(primerCaracter) || !esLetraEspanola(primerCaracter)) {
       errores.add("Regla 1: El primer carácter debe ser una letra mayúscula (A-Z, Ñ).");
     }
@@ -39,6 +82,22 @@ public class ServicioValidacion {
 
     if (ultimoCaracter != '.') {
       errores.add("Regla 8: La cadena debe terminar obligatoriamente con un punto (.).");
+    }
+
+    // Nueva regla: validar que la primera letra no se repita en ninguna parte
+    // EXCEPTO si esa letra está en las excepciones de repetición
+    char primeraLetraLower = Character.toLowerCase(primerCaracter);
+
+    if (!EXCEPCIONES_REPETICION.contains(primeraLetraLower)) {
+      for (int i = 1; i < longitud; i++) {
+        char caracterActual = cadenaEntrada.charAt(i);
+        char caracterActualLower = Character.toLowerCase(caracterActual);
+
+        if (caracterActualLower == primeraLetraLower && esLetraEspanola(caracterActual)) {
+          errores.add("Regla 10: La primera letra '" + primerCaracter + "' no puede repetirse en ninguna posición (ni en mayúscula ni en minúscula).");
+          break;
+        }
+      }
     }
 
     for (int i = 1; i < longitud; i++) {
