@@ -84,22 +84,6 @@ public class ServicioValidacion {
       errores.add("Regla 8: La cadena debe terminar obligatoriamente con un punto (.).");
     }
 
-    // Nueva regla: validar que la primera letra no se repita en ninguna parte
-    // EXCEPTO si esa letra está en las excepciones de repetición
-    char primeraLetraLower = Character.toLowerCase(primerCaracter);
-
-    if (!EXCEPCIONES_REPETICION.contains(primeraLetraLower)) {
-      for (int i = 1; i < longitud; i++) {
-        char caracterActual = cadenaEntrada.charAt(i);
-        char caracterActualLower = Character.toLowerCase(caracterActual);
-
-        if (caracterActualLower == primeraLetraLower && esLetraEspanola(caracterActual)) {
-          errores.add("Regla 10: La primera letra '" + primerCaracter + "' no puede repetirse en ninguna posición (ni en mayúscula ni en minúscula).");
-          break;
-        }
-      }
-    }
-
     for (int i = 1; i < longitud; i++) {
       char caracterActual = cadenaEntrada.charAt(i);
       char caracterAnterior = cadenaEntrada.charAt(i - 1);
@@ -116,6 +100,19 @@ public class ServicioValidacion {
 
         if (caracterActual == '.') {
           errores.add("Regla 9 (Derivada): El punto (.) solo se permite como último carácter.");
+        }
+      }
+
+      // Regla 10: La primera letra no puede repetirse INMEDIATAMENTE (consecutivamente)
+      if (i == 1) { // Solo validamos en la posición inmediatamente después de la primera
+        char primeraLetraLower = Character.toLowerCase(primerCaracter);
+        char caracterActualLower = Character.toLowerCase(caracterActual);
+
+        if (caracterActualLower == primeraLetraLower && esLetraEspanola(caracterActual)) {
+          // Si la primera letra NO está en excepciones, no puede repetirse ni siquiera una vez
+          if (!EXCEPCIONES_REPETICION.contains(primeraLetraLower)) {
+            errores.add("Regla 10: La primera letra '" + primerCaracter + "' no puede repetirse inmediatamente después.");
+          }
         }
       }
 
